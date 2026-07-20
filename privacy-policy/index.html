@@ -42,8 +42,9 @@
 <p>If you don't choose a destination, capture still works fully — recordings and transcripts stay on your device and appear in the app's list.</p>
 
 <h3>Notion</h3>
-<p>Murmur uses Notion's OAuth flow to get permission to write to a database in <strong>your own Notion workspace</strong>. This is equivalent to connecting a Notion integration, not creating an account with Murmur — Murmur has no visibility into your Notion workspace beyond the pages it creates for you.</p>
+<p>Murmur uses Notion's OAuth flow to get permission to write to a database in <strong>your own Notion workspace</strong>. This is equivalent to connecting a Notion integration, not creating an account with Murmur — during authorization you choose which pages and databases the connection covers, and Murmur can reach nothing outside that grant.</p>
 <ul>
+  <li>To let you pick a destination, Murmur asks Notion for the list of databases your grant covers and shows their names. Once you pick one, it reads that database's property schema (adding one property it needs) and looks up pages it previously created there, so an interrupted sync doesn't create a duplicate. It does not read the contents of your other pages.</li>
   <li>Syncing an idea uploads its audio file and transcript to your Notion workspace, where they become a page with the recording attached. This goes directly from your device to Notion's API; once there, the data is held by Notion under Notion's own privacy policy.</li>
   <li>OAuth token exchanges are brokered by a small, stateless server component that never stores your data or credentials — it only relays the initial authorization-code exchange and, periodically afterward, the refresh-token exchanges needed to keep your connection alive, with Notion.</li>
 </ul>
