@@ -8,6 +8,7 @@
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 680px; margin: 3rem auto; padding: 0 1.25rem; line-height: 1.6; color: #1c1c1e; }
   h1 { font-size: 1.6rem; }
   h2 { font-size: 1.15rem; margin-top: 2rem; }
+  h3 { font-size: 1rem; margin-top: 1.5rem; }
   p, li { color: #3a3a3c; }
   .updated { color: #8e8e93; font-size: 0.9rem; }
   @media (prefers-color-scheme: dark) {
@@ -18,7 +19,7 @@
 </head>
 <body>
 <h1>Murmur Privacy Policy</h1>
-<p class="updated">Last updated: 2026-07-10</p>
+<p class="updated">Last updated: 2026-07-20</p>
 
 <p>Murmur is a personal voice-capture app. This policy describes what data it handles and where it goes.</p>
 
@@ -36,18 +37,31 @@
   <li>Your audio and transcripts are never used for tracking, and are never sold or shared with third parties for advertising.</li>
 </ul>
 
-<h2>Optional: syncing to your own Notion workspace</h2>
-<p>If you choose to connect Notion in Settings, Murmur uses Notion's OAuth flow to get permission to write to a database in <strong>your own Notion workspace</strong>. This is equivalent to connecting a Notion integration, not creating an account with Murmur — Murmur has no visibility into your Notion workspace beyond the pages it creates for you.</p>
+<h2>Optional: syncing to a destination you own</h2>
+<p>In Settings you can choose one sync destination: <strong>Notion</strong> or <strong>Obsidian</strong>. Both are places you already own. Murmur never keeps a copy of your ideas on a server of its own, because it does not operate one.</p>
+<p>If you don't choose a destination, capture still works fully — recordings and transcripts stay on your device and appear in the app's list.</p>
+
+<h3>Notion</h3>
+<p>Murmur uses Notion's OAuth flow to get permission to write to a database in <strong>your own Notion workspace</strong>. This is equivalent to connecting a Notion integration, not creating an account with Murmur — Murmur has no visibility into your Notion workspace beyond the pages it creates for you.</p>
 <ul>
-  <li>The one-time OAuth authorization code exchange is brokered by a small, stateless server component that never stores your data or credentials — it only relays the token exchange with Notion. All subsequent traffic (creating pages, uploading recordings) goes directly from your device to Notion's API.</li>
-  <li>If you don't connect Notion, capture still works fully — recordings and transcripts stay on your device and appear in the app's list.</li>
+  <li>Syncing an idea uploads its audio file and transcript to your Notion workspace, where they become a page with the recording attached. This goes directly from your device to Notion's API; once there, the data is held by Notion under Notion's own privacy policy.</li>
+  <li>OAuth token exchanges are brokered by a small, stateless server component that never stores your data or credentials — it only relays the initial authorization-code exchange and, periodically afterward, the refresh-token exchanges needed to keep your connection alive, with Notion.</li>
+</ul>
+
+<h3>Obsidian</h3>
+<p>You pick a folder inside your own vault, and Murmur writes each idea there as a Markdown note with the audio file saved alongside it.</p>
+<ul>
+  <li>This is an ordinary file write on your device. Nothing is sent over the network, and no third party — including Notion and Murmur's developer — is involved.</li>
+  <li>Murmur's access is limited to the folder you picked, and lasts only as long as you keep that folder selected in Settings.</li>
+  <li>If your vault is stored in iCloud Drive or another file-sync service, that service will sync these files exactly as it syncs the rest of your vault, under its own privacy policy.</li>
 </ul>
 
 <h2>Your control over your data</h2>
 <ul>
-  <li>Delete any idea (audio + transcript) directly in the app at any time.</li>
+  <li>Delete any idea (audio + transcript) directly in the app at any time. In-app deletion removes the local copy only — if the idea has already synced, the Notion page or the Obsidian note stays where it is until you delete it there.</li>
   <li>Uninstalling the app removes all locally stored audio and transcripts.</li>
   <li>To revoke Murmur's access to your Notion workspace, remove the Murmur integration from your Notion workspace's connection settings at any time — independent of the app.</li>
+  <li>To revoke Murmur's access to your Obsidian vault, deselect the folder in Settings, or choose a different destination. Notes Murmur already wrote are ordinary files in your vault and remain yours to keep or delete.</li>
 </ul>
 
 <h2>Contact</h2>
