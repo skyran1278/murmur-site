@@ -89,15 +89,32 @@
     border: 1px solid var(--rule-soft);
     overflow: hidden;
   }
-  /* The recording UI — Listening…, the timer, the waveform, the stop button — sits in the
-     bottom third of the screenshot, so anchor the crop there: the frame fills with what the
-     panel is about, cut off and framed the way the App Store panels do it. */
-  .frame img.shot {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center bottom;
+
+  /* Device chrome follows the App Store panel templates (templates/device.html): a solid ink
+     body, a bezel made of padding, and no photorealism — the manual's palette has no metal
+     in it. Proportions are that template's, scaled down: bezel 3% of screen width, outer
+     radius 14% of body width, inner radius 10.4% of screen width. */
+  .frame-phone {
+    background: none;
+    border: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 20px;
   }
+  /* The phone is taller than the frame on purpose. It is bottom-anchored and the frame clips
+     the top, which is the same cut-off-and-framed idiom the panels use — and it keeps the
+     recording UI (Listening…, timer, waveform, stop button) at readable size instead of
+     shrinking a whole 589x1280 phone into a 400px-tall landscape box. */
+  .phone {
+    width: min(330px, 88%);
+    flex: none;
+    background: #1A1815;
+    padding: 10px;
+    border-radius: 46px;
+  }
+  .phone-screen { overflow: hidden; border-radius: 34px; background: var(--bg); }
+  .phone-screen img { width: 100%; height: auto; }
 
   /* A deliberately generic note page. It must never recreate Notion's UI — same rule the
      App Store panel template carries (marketing/screenshots/templates/twoends.html). */
@@ -231,11 +248,27 @@
     max-width: 440px;
     text-wrap: pretty;
   }
-  .watch .frame { height: 320px; padding: 22px; }
-  /* Both axes pinned with object-fit:contain, rather than width:auto + height:100%: as a
-     centred grid item the latter is sized intrinsically and overflowed the padding box by
-     13px, so overflow:hidden clipped the bottom of the watch off. */
-  .watch .frame img { width: 100%; height: 100%; object-fit: contain; }
+  /* Watch body, same template proportions relative to a 220px face: bezel 5.33%, body radius
+     23.5% of body width, face radius 21.5%, and the digital crown as a nub on the right. */
+  .watch-stage { display: flex; justify-content: center; }
+  .watch-device {
+    position: relative;
+    width: 244px;
+    padding: 12px;
+    background: #1A1815;
+    border-radius: 57px;
+  }
+  .watch-face { overflow: hidden; border-radius: 47px; background: #000; }
+  .watch-face img { width: 100%; height: auto; }
+  .watch-crown {
+    position: absolute;
+    right: -6px;
+    top: 35%;
+    width: 9px;
+    height: 50px;
+    border-radius: 5px;
+    background: #1A1815;
+  }
 
   /* ---- pricing --------------------------------------------------------------- */
   .pricing {
@@ -316,8 +349,12 @@
           <span class="eyebrow">You speak</span>
           <span class="panel-time mono">9:41:03</span>
         </div>
-        <div class="frame">
-          <img class="shot" src="/assets/shot-1.png" alt="Murmur recording an idea on iPhone: a live waveform, a running timer, and the stop button." width="589" height="1280" loading="lazy" decoding="async">
+        <div class="frame frame-phone">
+          <div class="phone">
+            <div class="phone-screen">
+              <img src="/assets/shot-1.png" alt="Murmur recording an idea on iPhone: a live waveform, a running timer, and the stop button." width="589" height="1280" loading="lazy" decoding="async">
+            </div>
+          </div>
         </div>
       </div>
       <div class="panel">
@@ -406,8 +443,13 @@
       <h2 class="serif">The same press, from your wrist.</h2>
       <p>The Apple Watch app records hands-free and hands the idea to your iPhone for transcription and sync.</p>
     </div>
-    <div class="frame">
-      <img src="/assets/shot-watch.png" alt="Murmur recording on Apple Watch." width="422" height="514" loading="lazy" decoding="async">
+    <div class="watch-stage">
+      <div class="watch-device">
+        <div class="watch-face">
+          <img src="/assets/shot-watch.png" alt="Murmur recording on Apple Watch." width="422" height="514" loading="lazy" decoding="async">
+        </div>
+        <span class="watch-crown" aria-hidden="true"></span>
+      </div>
     </div>
   </section>
 
