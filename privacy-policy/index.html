@@ -3,27 +3,46 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
 <title>Murmur Privacy Policy</title>
+<link rel="canonical" href="https://murmur.u-ran.com/privacy-policy">
+<link rel="icon" type="image/png" href="/assets/icon-360.png">
+<link rel="apple-touch-icon" href="/assets/icon-360.png">
+<link rel="stylesheet" href="/assets/base.css">
 <style>
-  /* Same paper/ink palette and serif headings as the landing page — this URL is linked from
-     the App Store listing, so it is part of the brand surface, not a stray document. */
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 680px; margin: 3rem auto; padding: 0 1.25rem; line-height: 1.6; color: #1A1815; background: #FAF8F4; }
-  h1, h2, h3 { font-family: "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif; font-weight: normal; }
-  h1 { font-size: 1.7rem; }
-  h2 { font-size: 1.25rem; margin-top: 2rem; }
-  h3 { font-size: 1.05rem; margin-top: 1.5rem; }
-  p, li { color: rgba(26, 24, 21, 0.75); }
-  a { color: #3B4FD8; }
-  .updated { color: rgba(26, 24, 21, 0.60); font-size: 0.9rem; }
-  @media (prefers-color-scheme: dark) {
-    body { background: #111014; color: #F5F2EA; }
-    p, li { color: rgba(245, 242, 234, 0.78); }
-    a { color: #93A2FF; }
-    .updated { color: rgba(245, 242, 234, 0.64); }
-  }
+  /* Prose only. Palette, type stacks, header and footer come from /assets/base.css — this
+     URL is linked from the App Store listing, so it is part of the brand surface, not a
+     stray document, and it must not carry a second copy of the palette. */
+  /* Flush left, like every other surface in this design (design manual — see the header
+     comment in marketing/screenshots/render.sh). */
+  .prose { max-width: 680px; margin: 3rem 0 4rem; line-height: 1.6; }
+  .prose h1, .prose h2, .prose h3 { font-family: var(--font-serif); font-weight: 400; }
+  .prose h1 { font-size: 1.7rem; }
+  .prose h2 { font-size: 1.25rem; }
+  .prose h3 { font-size: 1.05rem; }
+  .prose p, .prose li { color: rgba(var(--ink-rgb), 0.78); }
+  /* base.css zeroes every margin, so this page has to state its own prose rhythm — the
+     browser defaults it used to inherit as a standalone document are gone. */
+  .prose > * + * { margin-top: 0.85rem; }
+  .prose > h2 { margin-top: 2rem; }
+  .prose > h3 { margin-top: 1.5rem; }
+  .prose > .updated { margin-top: 0.35rem; }
+  .prose ul { padding-left: 1.25rem; }
+  .prose li + li { margin-top: 0.4rem; }
+  .updated { color: rgba(var(--ink-rgb), 0.62); font-size: 0.9rem; }
 </style>
 </head>
 <body>
+
+<header class="wrap">
+  <div class="masthead">
+    <a class="wordmark serif" href="/" aria-label="Murmur home">m<i>.</i></a>
+    <div class="eyebrow">Murmur for iPhone &amp; Apple Watch</div>
+  </div>
+</header>
+
+<main class="wrap">
+<div class="prose">
 <h1>Murmur Privacy Policy</h1>
 <p class="updated">Last updated: 2026-07-20</p>
 
@@ -73,5 +92,18 @@
 
 <h2>Contact</h2>
 <p>Questions about this policy can be sent via the support channel listed on Murmur's App Store listing.</p>
+</div>
+</main>
+
+<footer class="wrap">
+  <div class="site-footer">
+    <span class="links">
+      <a href="/privacy-policy">Privacy Policy</a>
+      <a href="mailto:murmur@u-ran.com">Support</a>
+    </span>
+    <span>© 2026 Murmur</span>
+  </div>
+</footer>
+
 </body>
 </html>
