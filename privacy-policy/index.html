@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>Murmur Privacy Policy</title>
+<meta name="description" content="How Murmur handles your audio recordings, on-device transcripts, and optional sync to your own Notion or Obsidian.">
 <link rel="canonical" href="https://murmur.u-ran.com/privacy-policy">
 <link rel="icon" type="image/png" href="/assets/icon-360.png">
 <link rel="apple-touch-icon" href="/assets/icon-360.png">
@@ -15,11 +16,11 @@
      stray document, and it must not carry a second copy of the palette. */
   /* Flush left, like every other surface in this design (design manual — see the header
      comment in marketing/screenshots/render.sh). */
-  .prose { max-width: 680px; margin: 3rem 0 4rem; line-height: 1.6; }
+  .prose { max-width: 720px; margin: 4rem 0 5rem; line-height: 1.8; font-size: 15px; }
   .prose h1, .prose h2, .prose h3 { font-family: var(--font-serif); font-weight: 400; }
-  .prose h1 { font-size: 1.7rem; }
-  .prose h2 { font-size: 1.25rem; }
-  .prose h3 { font-size: 1.05rem; }
+  .prose h1 { font-size: clamp(32px, 4vw, 46px); line-height: 1.2; letter-spacing: -.04em; }
+  .prose h2 { font-size: 28px; line-height: 1.3; letter-spacing: -.025em; }
+  .prose h3 { font-size: 22px; line-height: 1.3; }
   .prose p, .prose li { color: rgba(var(--ink-rgb), 0.78); }
   /* base.css zeroes every margin, so this page has to state its own prose rhythm — the
      browser defaults it used to inherit as a standalone document are gone. */
@@ -33,15 +34,16 @@
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 
 <header class="wrap">
   <div class="masthead">
-    <a class="wordmark serif" href="/" aria-label="Murmur home">m<i>.</i></a>
+    <a class="wordmark serif" href="/" aria-label="Murmur home">murmur<i>.</i></a>
     <div class="eyebrow">Murmur for iPhone &amp; Apple Watch</div>
   </div>
 </header>
 
-<main class="wrap">
+<main class="wrap" id="main">
 <div class="prose">
 <h1>Murmur Privacy Policy</h1>
 <p class="updated">Last updated: 2026-07-20</p>

@@ -1,476 +1,159 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Paper in every appearance. Declared here as well as in base.css because the stylesheet
-     is a separate request: this lands during parse, so a dark-mode browser never paints a
-     dark canvas first. -->
-<meta name="color-scheme" content="light">
-<title>Murmur — Say it out loud. Find it in Notion.</title>
-<meta name="description" content="Murmur transcribes on your iPhone — never in the cloud — and files the audio and the text into your own Notion database or Obsidian vault. Nothing to press afterwards.">
-<link rel="canonical" href="https://murmur.u-ran.com/">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://murmur.u-ran.com/">
-<meta property="og:title" content="Murmur — Say it out loud. Find it in Notion.">
-<meta property="og:description" content="On-device voice capture that files itself into your own Notion database or Obsidian vault. No cloud transcription, no middleman.">
-<meta property="og:image" content="https://murmur.u-ran.com/assets/icon-1024.png">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="icon" type="image/png" href="/assets/icon-360.png">
-<link rel="apple-touch-icon" href="/assets/icon-360.png">
-<link rel="stylesheet" href="/assets/base.css">
-<style>
-  /* Landing-page layout only. Tokens, type stacks, header and footer live in
-     /assets/base.css, which the privacy policy links too. */
-
-  /* ---- hero ------------------------------------------------------------------ */
-  .hero { padding-top: 82px; padding-bottom: 44px; }
-  .hero h1 {
-    font-size: clamp(36px, 6.4vw, 56px);
-    line-height: 1.16;
-    letter-spacing: -0.01em;
-    max-width: 760px;
-    text-wrap: pretty;
-  }
-  .hero .sub {
-    margin-top: 26px;
-    font-size: 19px;
-    line-height: 1.65;
-    color: var(--body-2);
-    max-width: 640px;
-    text-wrap: pretty;
-  }
-  .cta-row {
-    display: flex;
-    align-items: center;
-    gap: 22px;
-    margin-top: 38px;
-    flex-wrap: wrap;
-  }
-  .cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--cta-bg);
-    color: var(--cta-fg);
-    font-size: 17px;
-    font-weight: 600;
-    padding: 17px 28px;
-    border-radius: 10px;
-    box-shadow: 0 10px 28px rgba(59, 79, 216, 0.30);
-  }
-  .cta:hover { background: var(--cta-bg-hover); text-decoration: none; }
-  .cta-note { font-size: 14px; color: var(--muted); }
-
-  /* ---- the diptych ----------------------------------------------------------- */
-  .diptych-block { padding-bottom: 30px; }
-  /* 1px grid gap over a rule-coloured backdrop draws the divider, so the collapse to one
-     column at narrow widths turns it horizontal for free — no border side-swapping. */
-  .diptych {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1px;
-    background: var(--rule);
-    border: 1px solid var(--rule);
-  }
-  .panel { background: var(--bg); padding: 26px 30px 30px; }
-  .panel-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-  .panel-head .eyebrow { letter-spacing: 0.12em; }
-  .panel-time { font-size: 13px; color: var(--accent); }
-  .frame {
-    height: 400px;
-    background: var(--frame-fill);
-    border: 1px solid var(--rule-soft);
-    overflow: hidden;
-  }
-
-  /* Device chrome follows the App Store panel templates (templates/device.html): a solid ink
-     body, a bezel made of padding, and no photorealism — the manual's palette has no metal
-     in it. Proportions are that template's, scaled down: bezel 3% of screen width, outer
-     radius 14% of body width, inner radius 10.4% of screen width. */
-  .frame-phone {
-    background: none;
-    border: 0;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    padding-bottom: 20px;
-  }
-  /* The phone is taller than the frame on purpose. It is bottom-anchored and the frame clips
-     the top, which is the same cut-off-and-framed idiom the panels use — and it keeps the
-     recording UI (Listening…, timer, waveform, stop button) at readable size instead of
-     shrinking a whole 589x1280 phone into a 400px-tall landscape box. */
-  .phone {
-    width: min(330px, 88%);
-    flex: none;
-    background: #1A1815;
-    padding: 10px;
-    border-radius: 46px;
-  }
-  .phone-screen { overflow: hidden; border-radius: 34px; background: var(--bg); }
-  .phone-screen img { width: 100%; height: auto; }
-
-  /* A deliberately generic note page. It must never recreate Notion's UI — same rule the
-     App Store panel template carries (marketing/screenshots/templates/twoends.html). */
-  .note {
-    height: 100%;
-    background: var(--card);
-    padding: 26px 28px;
-    display: flex;
-    flex-direction: column;
-  }
-  .note-title { font-size: 20px; font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; }
-  .note-meta { margin-top: 10px; font-size: 13.5px; color: rgba(var(--ink-rgb), 0.55); }
-  .note-hr { margin-top: 18px; height: 1px; background: rgba(var(--ink-rgb), 0.12); }
-  .note-body {
-    margin-top: 18px;
-    font-size: 15px;
-    line-height: 1.62;
-    color: rgba(var(--ink-rgb), 0.82);
-    text-wrap: pretty;
-  }
-  .note-file {
-    margin-top: auto;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border: 1px solid var(--rule);
-    padding: 12px 14px;
-    font-size: 13.5px;
-    color: rgba(var(--ink-rgb), 0.75);
-  }
-  .note-file svg { flex: none; stroke: currentColor; }
-
-  .hinge {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-top: 14px;
-    flex-wrap: wrap;
-  }
-  .hinge .lead { font-size: 22px; }
-  .hinge .bar { flex: 1; min-width: 40px; height: 1px; background: rgba(var(--ink-rgb), 0.16); }
-  .hinge .tail { font-size: 15px; color: rgba(var(--ink-rgb), 0.60); }
-
-  /* ---- the chain ------------------------------------------------------------- */
-  .chain-block { padding-top: 56px; padding-bottom: 20px; }
-  .chain { list-style: none; margin-top: 6px; border-bottom: 1px solid var(--rule); }
-  .chain li {
-    display: grid;
-    grid-template-columns: 52px 300px 1fr;
-    gap: 28px;
-    align-items: baseline;
-    padding: 26px 0;
-    border-top: 1px solid var(--rule-soft);
-  }
-  .chain .n { font-size: 14px; color: var(--accent); }
-  .chain .t { font-size: 24px; line-height: 1.3; }
-  .chain .d { font-size: 16px; line-height: 1.7; color: rgba(var(--ink-rgb), 0.68); text-wrap: pretty; }
-
-  /* ---- entry points ---------------------------------------------------------- */
-  .entries-block { padding-top: 46px; padding-bottom: 52px; }
-  .entries {
-    list-style: none;
-    margin-top: 22px;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 1px;
-    background: rgba(var(--ink-rgb), 0.10);
-    border-top: 1px solid rgba(var(--ink-rgb), 0.12);
-    border-bottom: 1px solid rgba(var(--ink-rgb), 0.12);
-  }
-  .entries li {
-    background: var(--bg);
-    padding: 22px 18px;
-    font-size: 15.5px;
-    line-height: 1.5;
-    color: rgba(var(--ink-rgb), 0.75);
-  }
-  .entries-note {
-    margin-top: 18px;
-    font-size: 15px;
-    line-height: 1.7;
-    color: rgba(var(--ink-rgb), 0.60);
-    max-width: 620px;
-    text-wrap: pretty;
-  }
-
-  /* ---- privacy band ---------------------------------------------------------- */
-  .band { background: var(--band-bg); color: rgb(var(--band-rgb)); }
-  .band-inner {
-    padding-top: 64px;
-    padding-bottom: 64px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 56px;
-    align-items: start;
-  }
-  .band h2 { font-size: clamp(28px, 3.6vw, 36px); line-height: 1.25; text-wrap: pretty; }
-  .band p {
-    margin-top: 20px;
-    font-size: 16.5px;
-    line-height: 1.75;
-    color: rgba(var(--band-rgb), 0.66);
-    text-wrap: pretty;
-  }
-  .band ul { list-style: none; }
-  .band li {
-    display: flex;
-    align-items: baseline;
-    gap: 16px;
-    padding: 15px 0;
-    border-bottom: 1px solid rgba(var(--band-rgb), 0.14);
-  }
-  .band li .mark { font-size: 13px; color: var(--band-accent); flex: none; }
-  .band li span:last-child { font-size: 16px; line-height: 1.6; color: rgba(var(--band-rgb), 0.86); }
-
-  /* ---- watch ----------------------------------------------------------------- */
-  .watch {
-    padding-top: 60px;
-    padding-bottom: 60px;
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 56px;
-    align-items: center;
-  }
-  .watch h2 { font-size: clamp(26px, 3.2vw, 32px); line-height: 1.25; max-width: 440px; text-wrap: pretty; }
-  .watch p {
-    margin-top: 18px;
-    font-size: 16.5px;
-    line-height: 1.75;
-    color: var(--body-2);
-    max-width: 440px;
-    text-wrap: pretty;
-  }
-  /* Watch body, same template proportions relative to a 220px face: bezel 5.33%, body radius
-     23.5% of body width, face radius 21.5%, and the digital crown as a nub on the right. */
-  .watch-stage { display: flex; justify-content: center; }
-  .watch-device {
-    position: relative;
-    width: 244px;
-    padding: 12px;
-    background: #1A1815;
-    border-radius: 57px;
-  }
-  .watch-face { overflow: hidden; border-radius: 47px; background: #000; }
-  .watch-face img { width: 100%; height: auto; }
-  .watch-crown {
-    position: absolute;
-    right: -6px;
-    top: 35%;
-    width: 9px;
-    height: 50px;
-    border-radius: 5px;
-    background: #1A1815;
-  }
-
-  /* ---- pricing --------------------------------------------------------------- */
-  .pricing {
-    padding: 44px 0 52px;
-    border-top: 1px solid var(--rule);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 40px;
-    flex-wrap: wrap;
-  }
-  .pricing p {
-    font-size: 16.5px;
-    line-height: 1.7;
-    color: rgba(var(--ink-rgb), 0.68);
-    max-width: 560px;
-    text-wrap: pretty;
-  }
-  .pricing p strong { font-weight: inherit; color: var(--text); }
-
-  /* ---- responsive ------------------------------------------------------------
-     The design is drawn at one width and fixes every grid (1fr 1fr, repeat(5,1fr),
-     52px 300px 1fr, 1fr 300px). Those are desktop proportions, not intentions — the page
-     they replace is fully fluid, so they collapse here rather than overflow. */
-  @media (max-width: 900px) {
-    .chain li { grid-template-columns: 40px 1fr; gap: 8px 20px; }
-    .chain .t { grid-column: 2; }
-    .chain .d { grid-column: 2; margin-top: 4px; }
-    .entries { grid-template-columns: repeat(3, 1fr); }
-    /* Five entries never divide evenly below the 5-column layout, and the divider here is the
-       container showing through a 1px gap — so a missing cell paints as a solid rule-coloured
-       block, not as whitespace. Let the last entry span the remainder instead. */
-    .entries li:last-child { grid-column: span 2; }
-  }
-  @media (max-width: 760px) {
-    .hero { padding-top: 56px; }
-    .diptych { grid-template-columns: 1fr; }
-    .frame { height: 320px; }
-    .band-inner { grid-template-columns: 1fr; gap: 34px; padding-top: 52px; padding-bottom: 52px; }
-    .watch { grid-template-columns: 1fr; gap: 32px; }
-    .watch h2, .watch p { max-width: none; }
-    .chain-block { padding-top: 44px; }
-    .entries-block { padding-bottom: 40px; }
-  }
-  @media (max-width: 560px) {
-    .panel { padding: 22px 20px 24px; }
-    .entries { grid-template-columns: repeat(2, 1fr); }
-    .entries li:last-child { grid-column: span 2; }
-    .hinge .bar { display: none; }
-    .cta { width: 100%; justify-content: center; }
-  }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Murmur — Let your mind wander. Keep the thought.</title>
+  <meta name="description" content="A little more headspace. Capture a thought on iPhone or Apple Watch. Murmur transcribes it on your device and sends it to your own Notion or Obsidian.">
+  <link rel="canonical" href="https://murmur.u-ran.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://murmur.u-ran.com/">
+  <meta property="og:title" content="Murmur — Let your mind wander. Keep the thought.">
+  <meta property="og:description" content="From a passing thought to a note worth keeping. On-device voice capture for your Notion or Obsidian.">
+  <meta property="og:image" content="https://murmur.u-ran.com/assets/icon-1024.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="/assets/icon-360.png">
+  <link rel="apple-touch-icon" href="/assets/icon-360.png">
+  <link rel="stylesheet" href="/assets/base.css">
+  <link rel="stylesheet" href="/assets/home.css">
+  <script src="/assets/home.js" defer></script>
 </head>
 <body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-up-right" viewBox="0 0 24 24"><path d="M6 18 18 6M6 6h12v12"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m9 5 10 7-10 7Z"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-3 0h6"/></symbol>
+    <symbol id="i-wave" viewBox="0 0 24 24"><path d="M3 10v4m4-8v12m5-15v18m5-15v12m4-8v4"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="m13 2-9 12h7l-1 8 10-13h-8Z"/></symbol>
+    <symbol id="i-controls" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6" rx="3"/><rect x="3" y="14" width="18" height="6" rx="3"/><path d="M7 7h.01M17 17h.01" stroke-width="3"/></symbol>
+    <symbol id="i-apple" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M17.1 12.6c0-2 1.6-3 1.7-3.1-1-1.5-2.5-1.7-3.1-1.7-1.3-.1-2.6.8-3.3.8-.7 0-1.7-.8-2.8-.7-1.5 0-2.9.9-3.7 2.2-1.6 2.7-.4 6.8 1.1 9 .7 1.1 1.6 2.2 2.7 2.1 1.1 0 1.5-.7 2.9-.7 1.3 0 1.7.7 2.9.7 1.2 0 1.9-1.1 2.7-2.1.8-1.2 1.2-2.4 1.2-2.5-.1 0-2.3-.9-2.3-4ZM14.9 6.4c.6-.8 1.1-1.9 1-3-.9 0-2 .6-2.7 1.4-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.5 2.7-1.3Z"/></symbol>
+  </svg>
 
-<header class="wrap">
-  <div class="masthead">
-    <div class="wordmark serif">m<i>.</i></div>
-    <div class="eyebrow">Murmur for iPhone &amp; Apple Watch</div>
-  </div>
-</header>
-
-<main>
-
-  <section class="wrap hero">
-    <h1 class="serif">Say it out loud. Find it in Notion.</h1>
-    <p class="sub">Murmur transcribes on your iPhone — never in the cloud — and files the audio and the text into your own Notion database or Obsidian vault. Nothing to press afterwards.</p>
-    <div class="cta-row">
-      <a class="cta" href="https://apps.apple.com/app/id6788226431">Download on the App&nbsp;Store</a>
-      <span class="cta-note">Free for your first 50 ideas</span>
+  <header class="wrap">
+    <div class="masthead">
+      <a class="wordmark serif" href="/" aria-label="Murmur home">murmur<i>.</i></a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="#how-it-works">How it works</a>
+        <a href="#everyday">In your everyday</a>
+        <a href="#privacy">Privacy</a>
+      </nav>
+      <a class="button button-small button-outline" href="https://apps.apple.com/app/id6788226431">Get Murmur <svg class="icon" aria-hidden="true"><use href="#i-up-right"/></svg></a>
     </div>
-  </section>
+  </header>
 
-  <section class="wrap diptych-block">
-    <div class="diptych">
-      <div class="panel">
-        <div class="panel-head">
-          <span class="eyebrow">You speak</span>
-          <span class="panel-time mono">9:41:03</span>
+  <main id="main">
+    <section class="wrap hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="small-dot"></span> A little more headspace</p>
+        <h1 class="serif" id="hero-title">Let your<br>mind <em>wander.</em></h1>
+        <p class="hero-description">The thought is worth keeping.<br>Murmur transcribes your voice on your iPhone, then files it in your own Notion or Obsidian.</p>
+        <a class="button button-primary" href="https://apps.apple.com/app/id6788226431"><svg class="icon apple-icon" aria-hidden="true"><use href="#i-apple"/></svg> Download on the App Store <svg class="icon cta-arrow" aria-hidden="true"><use href="#i-up-right"/></svg></a>
+        <p class="hero-footnote">Your first 50 ideas, free. <span>iPhone &amp; Apple Watch.</span></p>
+      </div>
+
+      <div class="demo" data-stage="saved" role="region" aria-label="Interactive example of a voice note becoming a saved idea">
+        <div class="demo-topline"><span class="eyebrow">A passing thought</span><span class="demo-example mono">An example, by Murmur</span></div>
+        <div class="voice-card">
+          <div class="voice-meta"><span><svg class="icon" aria-hidden="true"><use href="#i-mic"/></svg> You, on a walk</span><span class="mono" id="demo-time">00:08</span></div>
+          <p class="voice-quote serif" id="voice-quote">“Maybe the best ideas come when you take the long way home.”</p>
+          <div class="waveform" aria-hidden="true">
+            <svg viewBox="0 0 400 62" preserveAspectRatio="none"><g id="wave-bars" stroke="currentColor" stroke-width="3.5" stroke-linecap="round">
+              <path d="M4 29v4M12 26v10M20 22v18M28 27v8M36 18v26M44 23v16M52 12v38M60 18v26M68 8v46M76 15v32M84 21v20M92 13v36M100 5v52M108 11v40M116 18v26M124 24v14M132 17v28M140 12v38M148 21v20M156 25v12M164 19v24M172 12v38M180 4v54M188 9v44M196 16v30M204 23v16M212 18v26M220 11v40M228 18v26M236 24v14M244 21v20M252 14v34M260 8v46M268 15v32M276 20v22M284 13v36M292 18v26M300 24v14M308 20v22M316 15v32M324 22v18M332 18v26M340 25v12M348 21v20M356 26v10M364 23v16M372 27v8M380 24v14M388 28v6M396 29v4"/>
+            </g></svg>
+          </div>
+          <div class="voice-bottom"><span class="voice-status" id="voice-status">A thought, captured.</span><span class="serif voice-mark" aria-hidden="true">m<span>.</span></span></div>
         </div>
-        <div class="frame frame-phone">
-          <div class="phone">
-            <div class="phone-screen">
-              <img src="/assets/shot-1.png" alt="Murmur recording an idea on iPhone: a live waveform, a running timer, and the stop button." width="589" height="1280" loading="lazy" decoding="async">
-            </div>
+        <div class="journey-thread" aria-hidden="true"><svg viewBox="0 0 140 84"><path d="M13 4c0 34 100 4 104 41 2 18-25 20-29 29m-5-12 4 13 13-4"/></svg><span>Out of your head.<br>Into your notes.</span></div>
+        <div class="note-card">
+          <div class="note-topline"><span class="mono">IDEA 001</span><span class="saved-status"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span id="note-status">Saved to Notion</span></span></div>
+          <h2 class="serif note-title" id="note-title">Maybe the best ideas come…</h2>
+          <p class="note-transcript" id="note-transcript">Maybe the best ideas come when you take the long way home.</p>
+          <div class="note-attachment"><svg class="icon" aria-hidden="true"><use href="#i-wave"/></svg><span class="mono" id="note-file">idea-001.m4a</span><span>Original audio, too.</span></div>
+        </div>
+        <div class="demo-controls" hidden>
+          <button class="demo-play" id="demo-play" type="button"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg><span>See it happen</span></button>
+          <div class="destination-picker" role="group" aria-label="Example note destination">
+            <button type="button" data-destination="Notion" aria-pressed="true">Notion</button>
+            <button type="button" data-destination="Obsidian" aria-pressed="false">Obsidian</button>
           </div>
         </div>
+        <p class="sr-only" id="demo-announcement" role="status" aria-live="polite" aria-atomic="true"></p>
       </div>
-      <div class="panel">
-        <div class="panel-head">
-          <span class="eyebrow">Your Notion, untouched by you</span>
-          <span class="panel-time mono">9:41:26</span>
+    </section>
+
+    <div class="wrap">
+      <div class="promise-strip">
+        <p>Less in your head. <span>More in your notebook.</span></p>
+        <div><span class="eyebrow">Made for your</span><span class="destination-name"><span class="notion-mark serif" aria-hidden="true">N</span> Notion</span><span class="destination-plus" aria-hidden="true">/</span><span class="destination-name"><svg class="obsidian-mark" viewBox="0 0 24 28" aria-hidden="true"><path d="m14 1 7 7 2 12-9 7-11-5 2-12Z"/><path d="m14 1-4 10 4 16m-4-16 11-3m-11 3-7 11"/></svg> Obsidian</span></div>
+      </div>
+    </div>
+
+    <section class="wrap how-section" id="how-it-works" aria-labelledby="how-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">01 / From thought to note</p><h2 class="serif" id="how-title">Say it. Then go on with your day.</h2></div>
+        <p>One small moment for you.<br>The rest takes care of itself.</p>
+      </div>
+      <ol class="steps">
+        <li><div class="step-top"><span class="mono">01</span><svg class="icon" aria-hidden="true"><use href="#i-mic"/></svg></div><h3 class="serif">Catch the thought.</h3><p>One tap, and you’re recording. A reminder, a wild idea, a sentence you don’t want to lose.</p></li>
+        <li><div class="step-top"><span class="mono">02</span><svg class="icon" aria-hidden="true"><use href="#i-wave"/></svg></div><h3 class="serif">Let it become words.</h3><p>Your iPhone transcribes it, right on the device. Your original audio is saved first, every time.</p></li>
+        <li><div class="step-top"><span class="mono">03</span><svg class="icon" aria-hidden="true"><use href="#i-up-right"/></svg></div><h3 class="serif">Find it where you think.</h3><p>A note in your Notion database or Obsidian vault, with the audio attached. Already at home.</p></li>
+      </ol>
+    </section>
+
+    <section class="everyday-section" id="everyday" aria-labelledby="everyday-title">
+      <div class="wrap everyday-grid">
+        <div class="everyday-copy">
+          <p class="eyebrow">02 / Made for the in-between</p>
+          <h2 class="serif" id="everyday-title">Life happens.<br><em>Ideas tag along.</em></h2>
+          <p>On a walk. Between meetings. Halfway out the door. Your best thoughts rarely wait for you to open a notebook.</p>
+          <p>Murmur is a tap away, on your iPhone or your wrist. The Apple Watch captures your voice; your iPhone handles transcription and sync.</p>
+          <ul class="entry-points" aria-label="Ways to start recording">
+            <li><svg class="icon" aria-hidden="true"><use href="#i-bolt"/></svg><span>Action Button</span></li>
+            <li><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg><span>Lock Screen</span></li>
+            <li><svg class="icon" aria-hidden="true"><use href="#i-controls"/></svg><span>Control Center</span></li>
+          </ul>
         </div>
-        <div class="frame">
-          <div class="note">
-            <div class="note-title">Ask the dentist about the night guard</div>
-            <div class="note-meta">Created 9:41 AM · Murmur</div>
-            <div class="note-hr"></div>
-            <p class="note-body">Ask the dentist about the night guard — the top left one keeps waking me up around four. Also ask whether the insurance covers it before the end of the year.</p>
-            <div class="note-file">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
-                <path d="M2 7v2M5 4.5v7M8 2.5v11M11 5v6M14 7v2"></path>
-              </svg>
-              <span class="mono">idea-9-41.m4a · 0:17</span>
-            </div>
-          </div>
+        <div class="device-scene">
+          <div class="scene-orbit" aria-hidden="true"></div>
+          <div class="scene-caption caption-phone"><span class="mono">IN YOUR POCKET</span><svg viewBox="0 0 85 55" aria-hidden="true"><path d="M4 5c42 0 26 37 69 34m-10-8 12 8-11 9"/></svg></div>
+          <div class="phone-device"><div class="phone-screen"><img src="/assets/shot-1.png" alt="The Murmur iPhone app: saved ideas above an active recording, with a timer and indigo waveform." width="589" height="1280" loading="lazy" decoding="async"></div></div>
+          <div class="watch-device"><div class="watch-face"><img src="/assets/shot-watch.png" alt="Murmur on Apple Watch, recording a thought with a single stop button." width="422" height="514" loading="lazy" decoding="async"></div><span class="watch-crown" aria-hidden="true"></span></div>
+          <p class="scene-caption caption-watch"><span class="serif">Or just a wrist away.</span><span class="mono">APPLE WATCH, INCLUDED</span></p>
         </div>
       </div>
-    </div>
-    <div class="hinge">
-      <span class="lead serif">Twenty-three seconds apart.</span>
-      <span class="bar"></span>
-      <span class="tail">Nothing happened in between.</span>
-    </div>
-  </section>
+    </section>
 
-  <section class="wrap chain-block">
-    <h2 class="eyebrow">What happens in those 23 seconds</h2>
-    <ol class="chain">
-      <li>
-        <span class="n mono">01</span>
-        <span class="t serif">You press once</span>
-        <span class="d">Action Button, Lock Screen, Control Center, Watch, or the app. The recording starts before the screen has finished waking up.</span>
-      </li>
-      <li>
-        <span class="n mono">02</span>
-        <span class="t serif">Audio hits the disk</span>
-        <span class="d">Written to storage first, every time — before transcription, before sync. A failed network never costs you an idea.</span>
-      </li>
-      <li>
-        <span class="n mono">03</span>
-        <span class="t serif">Your iPhone reads it back</span>
-        <span class="d">Speech recognition runs on the device. No cloud transcription service is involved, in any language.</span>
-      </li>
-      <li>
-        <span class="n mono">04</span>
-        <span class="t serif">It files itself</span>
-        <span class="d">A new page in your own Notion database, or a note in your own Obsidian vault, with the audio attached. You did not open either one.</span>
-      </li>
-    </ol>
-  </section>
-
-  <section class="wrap entries-block">
-    <h2 class="eyebrow">One press — from wherever you are</h2>
-    <ul class="entries">
-      <li>Action Button</li>
-      <li>Lock Screen</li>
-      <li>Control Center</li>
-      <li>Apple Watch</li>
-      <li>The app</li>
-    </ul>
-    <p class="entries-note">Audio is written to disk before anything else happens, every time. You never lose an idea to a failed sync.</p>
-  </section>
-
-  <section class="band">
-    <div class="wrap band-inner">
-      <div>
-        <h2 class="serif">Murmur has no server to keep your ideas on.</h2>
-        <p>Speech recognition runs entirely on your device. No cloud transcription service ever hears your voice, and there is no account to create — your notes go from your microphone to your own vault.</p>
-      </div>
-      <ul>
-        <li><span class="mark mono" aria-hidden="true">—</span><span>No cloud transcription</span></li>
-        <li><span class="mark mono" aria-hidden="true">—</span><span>No account to create</span></li>
-        <li><span class="mark mono" aria-hidden="true">—</span><span>No ads, no analytics</span></li>
-        <li><span class="mark mono" aria-hidden="true">—</span><span>No Murmur server, at all</span></li>
-      </ul>
-    </div>
-  </section>
-
-  <section class="wrap watch">
-    <div>
-      <h2 class="serif">The same press, from your wrist.</h2>
-      <p>The Apple Watch app records hands-free and hands the idea to your iPhone for transcription and sync.</p>
-    </div>
-    <div class="watch-stage">
-      <div class="watch-device">
-        <div class="watch-face">
-          <img src="/assets/shot-watch.png" alt="Murmur recording on Apple Watch." width="422" height="514" loading="lazy" decoding="async">
+    <section class="privacy-section" id="privacy" aria-labelledby="privacy-title">
+      <div class="wrap privacy-grid">
+        <div><p class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg> 03 / Yours, by design</p><h2 class="serif" id="privacy-title">A private thought<br>should stay <em>that way.</em></h2><a class="text-link" href="/privacy-policy">Our privacy promise <svg class="icon" aria-hidden="true"><use href="#i-up-right"/></svg></a></div>
+        <div class="privacy-facts">
+          <div><span class="mono">01</span><div><h3>On your device. In your words.</h3><p>Transcription happens on your iPhone. No cloud transcription service hears your voice.</p></div></div>
+          <div><span class="mono">02</span><div><h3>Your notes have a home. You choose it.</h3><p>Keep them on your device, or send your audio and text directly to your own Notion or Obsidian.</p></div></div>
+          <div><span class="mono">03</span><div><h3>Simply yours.</h3><p>No Murmur account. No ads. No analytics. We don’t store your recordings on our servers.</p></div></div>
         </div>
-        <span class="watch-crown" aria-hidden="true"></span>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="wrap">
-    <div class="pricing">
-      <p>Your first 50 ideas include everything — every language, Apple Watch, and automatic sync. That allowance is one-time; it never resets. When it runs out, everything you've captured keeps working. <strong>Pro adds one thing: unlimited new ideas — US$5.99/month or US$59.99/year.</strong></p>
-      <a class="cta" href="https://apps.apple.com/app/id6788226431">Download on the App&nbsp;Store</a>
-    </div>
-  </section>
+    <section class="wrap faq-section" aria-labelledby="faq-title">
+      <div><p class="eyebrow">A few good questions</p><h2 class="serif" id="faq-title">Before your<br>first murmur.</h2></div>
+      <div class="faq-list">
+        <details><summary>What’s included for free?<span class="faq-toggle" aria-hidden="true"></span></summary><div class="faq-answer"><p>Your first 50 ideas include everything — every language, Apple Watch, and automatic sync. That allowance is one-time; it never resets.</p><p>Murmur Pro unlocks unlimited new ideas with a monthly or yearly subscription. Your existing recordings and notes stay available when the free allowance runs out. See current pricing in the app.</p></div></details>
+        <details><summary>Does it work without internet?<span class="faq-toggle" aria-hidden="true"></span></summary><div class="faq-answer"><p>Yes. Recording and transcription work offline once the speech model for your chosen language is downloaded. Your audio is saved before transcription or sync begins. Notion sync waits for a connection; Obsidian notes are written to the vault folder you select.</p></div></details>
+        <details><summary>Do I need Notion or Obsidian?<span class="faq-toggle" aria-hidden="true"></span></summary><div class="faq-answer"><p>No. You can keep recordings and transcripts in Murmur. If you want automatic sync, connect your own Notion database or choose a folder in your Obsidian vault in Settings.</p></div></details>
+        <details><summary>How does Apple Watch capture work?<span class="faq-toggle" aria-hidden="true"></span></summary><div class="faq-answer"><p>Record from the Watch app or a Murmur complication on your watch face. Your Watch saves the audio and transfers it to the paired iPhone, where Murmur transcribes it and syncs it to your selected destination.</p></div></details>
+      </div>
+    </section>
 
-</main>
+    <section class="wrap closing" aria-labelledby="closing-title">
+      <div class="closing-top"><span class="serif closing-mark" aria-hidden="true">m<span>.</span></span><p class="eyebrow">Good things start with a little thought.</p></div>
+      <div class="closing-row"><h2 class="serif" id="closing-title">Make room for<br>your next <em>murmur.</em></h2><div class="closing-action"><a class="button button-primary" href="https://apps.apple.com/app/id6788226431"><svg class="icon apple-icon" aria-hidden="true"><use href="#i-apple"/></svg> Download on the App Store <svg class="icon cta-arrow" aria-hidden="true"><use href="#i-up-right"/></svg></a><p>50 ideas to begin. A little more headspace to keep.</p></div></div>
+    </section>
+  </main>
 
-<footer class="wrap">
-  <div class="site-footer">
-    <span class="links">
-      <a href="/privacy-policy">Privacy Policy</a>
-      <a href="mailto:murmur@u-ran.com">Support</a>
-    </span>
-    <span>© 2026 Murmur</span>
-  </div>
-</footer>
-
+  <footer class="wrap"><div class="site-footer"><a class="wordmark serif" href="/" aria-label="Murmur home">murmur<i>.</i></a><span class="footer-note">Small app. Space for big thoughts.</span><div class="links"><a href="/privacy-policy">Privacy</a><a href="mailto:murmur@u-ran.com">Say hello <span aria-hidden="true">↗</span></a><span>© 2026 Murmur</span></div></div></footer>
 </body>
 </html>

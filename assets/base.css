@@ -1,107 +1,52 @@
-/* Shared shell for murmur.u-ran.com — tokens, type stacks, header and footer.
-   Both pages link this. The palette lives in exactly one place on purpose: the privacy
-   policy previously carried its own copy of the same hex values, which is how two pages
-   that are supposed to be one brand surface drift apart.
-
-   Palette and type follow the app's design manual (paper/ink, indigo accent, Iowan Old
-   Style titles) so the site, the App Store panels and the app itself read as one thing. */
-
-/* The site is paper in every appearance — one palette, no prefers-color-scheme branch.
-   The design is drawn as ink on paper with a single deliberately inverted band, and that
-   contrast IS the composition; re-toning it for a dark viewer inverts the figure/ground
-   the page is built on. color-scheme:light is what makes the choice stick: it stops a
-   dark-mode browser from darkening the scrollbar and form controls around a light page,
-   and from flashing a dark canvas before this stylesheet lands.
-
-   Every ink tint is still rgba(var(--ink-rgb), a). Not for theming now — it keeps the
-   whole tint ladder derived from one value instead of 20 loose rgba() literals. */
+/* Shared paper, ink, and indigo identity. The policy uses the same shell. */
 :root {
   color-scheme: light;
-
   --ink-rgb: 26, 24, 21;
-  --bg: #FAF8F4;
-  --text: #1A1815;
-  --card: #FFFFFF;
-  --accent: #3B4FD8;
-
-  --cta-bg: #3B4FD8;
-  --cta-bg-hover: #2E3DB0;
-  --cta-fg: #FFFFFF;
-
-  /* The privacy band is the one inverted surface: ink ground, paper text. It carries its
-     own ink and never reads from --ink-rgb. */
-  --band-bg: #111014;
-  --band-rgb: 245, 242, 234;
-  --band-accent: #93A2FF;
-
-  --rule: rgba(var(--ink-rgb), 0.14);
-  --rule-soft: rgba(var(--ink-rgb), 0.10);
-  --frame-fill: rgba(var(--ink-rgb), 0.035);
-  --muted: rgba(var(--ink-rgb), 0.50);
-  --body-2: rgba(var(--ink-rgb), 0.66);
-
+  --bg: #faf8f4;
+  --text: #1a1815;
+  --card: #fffefa;
+  --accent: #3b4fd8;
+  --accent-hover: #2e3db0;
+  --rule: rgba(var(--ink-rgb), .17);
+  --rule-soft: rgba(var(--ink-rgb), .1);
+  --muted: #77736c;
+  --body-2: #6c6862;
   --font-serif: "Iowan Old Style", "Palatino Nova", Palatino, "Palatino Linotype", Georgia, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", sans-serif;
-  color: var(--text);
-  background: var(--bg);
-  -webkit-font-smoothing: antialiased;
-}
-
-/* Iowan Old Style is an Apple system font; visitors elsewhere fall through to Palatino and
-   then Georgia. Every heading on this stack sets font-weight:400 explicitly — Iowan has no
-   medium face, and the UA's default bold on h1/h2 is synthesized into fake bold
-   (design manual §3). Never raise a weight on .serif. */
-.serif { font-family: var(--font-serif); font-weight: 400; }
-.mono { font-family: var(--font-mono); }
-
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: 28px; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", sans-serif; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; }
 a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; }
-img { display: block; max-width: 100%; }
-
-.wrap { max-width: 1000px; margin: 0 auto; padding-left: 20px; padding-right: 20px; }
-
-/* Small caps eyebrow — the recurring section marker of this layout. */
-.eyebrow {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.masthead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 26px 0;
-  border-bottom: 1px solid var(--rule-soft);
-}
-.masthead a:hover { text-decoration: none; }
-.wordmark { font-size: 30px; line-height: 34px; color: var(--text); }
+a:hover { text-decoration: underline; text-underline-offset: 4px; }
+a, button, summary { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+::selection { background: #dce0fa; color: var(--text); }
+img { display: block; max-width: 100%; height: auto; }
+[hidden] { display: none !important; }
+.serif { font-family: var(--font-serif); font-weight: 400; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: 40px; padding-right: 40px; }
+.eyebrow { color: var(--body-2); font-size: 11px; line-height: 1.6; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; }
+.icon { width: 20px; height: 20px; display: inline-block; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
+.svg-library { position: absolute; width: 0; height: 0; overflow: hidden; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.skip-link { position: absolute; top: 12px; left: 12px; z-index: 10; padding: 12px 20px; background: var(--text); color: var(--bg); transform: translateY(-150%); }
+.skip-link:focus { transform: translateY(0); }
+.masthead { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 101px; border-bottom: 1px solid var(--rule); }
+.wordmark { color: var(--text); font-size: 34px; line-height: 1; letter-spacing: -.07em; }
 .wordmark i { color: var(--accent); font-style: normal; }
-.masthead .eyebrow { text-align: right; }
-
-.site-footer {
-  padding: 26px 0 44px;
-  border-top: 1px solid var(--rule-soft);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  flex-wrap: wrap;
-  font-size: 13.5px;
-  color: rgba(var(--ink-rgb), 0.55);
+.masthead a:hover, a.wordmark:hover { text-decoration: none; }
+.masthead > .eyebrow { text-align: right; }
+.site-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px; padding: 32px 0 38px; border-top: 1px solid var(--rule); font-size: 12px; color: var(--body-2); }
+.site-footer .wordmark { font-size: 28px; }
+.site-footer .links { display: flex; align-items: center; flex-wrap: wrap; gap: 24px; }
+.site-footer .links a { color: var(--body-2); }
+@media (max-width: 760px) {
+  .wrap { padding-left: 24px; padding-right: 24px; }
+  .masthead { min-height: 82px; }
+  .wordmark { font-size: 31px; }
+  .site-footer { gap: 22px; padding-bottom: 28px; }
 }
-.site-footer .links { display: flex; gap: 20px; }
-
-@media (max-width: 560px) {
-  .masthead { padding: 20px 0; }
-  .masthead .eyebrow { font-size: 11px; letter-spacing: 0.1em; }
-}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
