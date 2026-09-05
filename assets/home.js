@@ -45,10 +45,12 @@
     play.disabled = false;
     playLabel.textContent = 'Try another thought';
     announcement.textContent = `Example complete. The original audio and transcript are saved to ${destination}.`;
+    demo.dispatchEvent(new Event('murmur:demo-saved'));
   }
 
   play.addEventListener('click', () => {
     clearTimers();
+    demo.dispatchEvent(new Event('murmur:demo-start'));
     const example = examples[sequence % examples.length];
     const number = String(sequence % examples.length + 1).padStart(3, '0');
     document.querySelector('#voice-quote').textContent = `“${example.quote}”`;
@@ -73,6 +75,7 @@
       demo.dataset.stage = 'transcribing';
       voiceStatus.textContent = 'Transcribing on your iPhone…';
       noteStatus.textContent = 'Turning voice into words…';
+      demo.dispatchEvent(new Event('murmur:demo-transcribing'));
     }, 1100));
     timers.push(window.setTimeout(finish, 2300));
   });
@@ -84,6 +87,7 @@
       if (demo.dataset.stage === 'saved') {
         noteStatus.textContent = `Saved to ${destination}`;
         announcement.textContent = `Example destination changed to ${destination}. Your note includes the transcript and original audio.`;
+        demo.dispatchEvent(new Event('murmur:destination-changed'));
       }
     });
   });
